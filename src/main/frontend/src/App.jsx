@@ -1,19 +1,25 @@
-import React, { useEffect } from "react";
+import axios from "axios";
+import React, { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
+import Logout from "./Logout/Logout";
 
 function App() {
   const [cookies, setCookies] = useCookies(["XSRF-TOKEN"]);
+  const [message, setMessage] = useState("");
+  useEffect(() => {
+    axios
+      .get("http://localhost:8080/test")
+      .then((response) => setMessage(response.data))
+      .catch((error) => console.log(error));
+  }, [cookies]);
   return (
     <div>
-      <p>CSRF Token: {cookies["XSRF-TOKEN"]}</p>
-      <form method="POST" action="/logout">
-        <input
-          type="hidden"
-          name="_csrf"
-          value={cookies["XSRF-TOKEN"]}
-        />
-        <button type="submit">Logout</button>
-      </form>
+      <nav>
+        <Logout xsrfToken={cookies["XSRF-TOKEN"]} />
+      </nav>
+      <main>
+        <h1>And the message is: {message}</h1>
+      </main>
     </div>
   );
 }
